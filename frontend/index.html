@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full theme-dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌿 MangrovePulse Dashboard</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Theme Variables -->
+  <style>
+    .theme-dark {
+      --color-bg: #111827; /* gray-900 */
+      --color-surface: #1f2937; /* gray-800 */
+      --color-text: #d1d5db; /* gray-300 */
+      --color-text-muted: #6b7280; /* gray-500 */
+      --color-primary: #34d399; /* emerald-400 */
+      --color-primary-light: #6ee7b7; /* emerald-300 */
+      --color-border: #374151; /* gray-700 */
+    }
+    .theme-light {
+      --color-bg: #f9fafb; /* gray-50 */
+      --color-surface: #ffffff; /* white */
+      --color-text: #1f2937; /* gray-800 */
+      --color-text-muted: #6b7280; /* gray-500 */
+      --color-primary: #059669; /* emerald-600 */
+      --color-primary-light: #10b981; /* emerald-500 */
+      --color-border: #e5e7eb; /* gray-200 */
+    }
+    .theme-ocean {
+      --color-bg: #0b192f; 
+      --color-surface: #172a45;
+      --color-text: #c2d4ee;
+      --color-text-muted: #8892b0;
+      --color-primary: #00f5d4;
+      --color-primary-light: #96f5e5;
+      --color-border: #2f4564;
+    }
+  </style>
+</head>
+<body class="h-full text-[var(--color-text)] bg-[var(--color-bg)]">
+  <div class="flex flex-col h-screen">
+    <!-- Navbar -->
+    <nav class="bg-[var(--color-surface)] shadow-lg z-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🌿</span>
+            <h1 class="text-xl font-bold text-[var(--color-primary)]" data-i18n="title"></h1>
+          </div>
+          <!-- Language Switcher -->
+          <div id="lang-switcher" class="flex items-center space-x-2">
+            <button data-lang="id" class="lang-btn p-1 rounded-md">🇮🇩</button>
+            <button data-lang="en" class="lang-btn p-1 rounded-md">🇬🇧</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden min-h-0">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-[var(--color-surface)] p-4 space-y-6 overflow-y-auto">
+        
+        <!-- Theme Switcher -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2 text-[var(--color-primary-light)]" data-i18n="theme"></h3>
+          <div id="theme-switcher" class="flex space-x-2">
+            <button data-theme="theme-dark" class="theme-btn w-8 h-8 rounded-full bg-gray-900 border-2 border-gray-500" title="Dark"></button>
+            <button data-theme="theme-light" class="theme-btn w-8 h-8 rounded-full bg-gray-50 border-2 border-gray-300" title="Light"></button>
+            <button data-theme="theme-ocean" class="theme-btn w-8 h-8 rounded-full bg-[#0b192f] border-2 border-[#2f4564]" title="Ocean"></button>
+          </div>
+        </div>
+
+        <!-- Year Selector -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2 text-[var(--color-primary-light)]" data-i18n="year"></h3>
+          <select id="year-selector" class="w-full p-2 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)]">
+            <!-- Options will be populated by script.js -->
+          </select>
+        </div>
+
+        <!-- Layer Toggle -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2 text-[var(--color-primary-light)]" data-i18n="mapLayers"></h3>
+          <div id="layer-control" class="space-y-2">
+            <!-- Radio buttons will be inserted here by script.js -->
+          </div>
+        </div>
+
+        <!-- Analysis Tools -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2 text-[var(--color-primary-light)]" data-i18n="analysisTools"></h3>
+          <div id="analysis-tools" class="space-y-2">
+            <button id="analyze-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded hidden" data-i18n="analyzeArea"></button>
+            <button id="export-tiff-btn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded hidden" data-i18n="exportTIFF"></button>
+            <button id="export-drive-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-gray-800 font-bold py-2 px-4 rounded hidden" data-i18n="exportToDrive"></button>
+            <button id="export-pdf-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hidden" data-i18n="exportPDF"></button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div>
+          <h3 class="font-semibold text-lg mb-2 text-[var(--color-primary-light)]" data-i18n="legend"></h3>
+          <div id="legend" class="space-y-1 text-sm">
+            <!-- Legend items will be dynamically inserted here -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Map & Analysis Panel -->
+      <main class="flex-1 flex flex-col">
+        <div id="map" class="flex-1"></div>
+        <div id="analysis-panel" class="h-1/3 bg-[var(--color-surface)] p-4 border-t-2 border-[var(--color-primary)] overflow-y-auto hidden">
+            <h2 class="text-xl font-bold mb-2" data-i18n="analysisResult"></h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div id="stats-container"></div>
+                <div id="chart-container" class="relative h-64">
+                    <canvas id="timeseries-chart"></canvas>
+                </div>
+                <div id="pie-chart-container" class="relative h-64">
+                    <canvas id="pie-chart"></canvas>
+                </div>
+            </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[var(--color-bg)] text-center p-2 text-xs text-[var(--color-text-muted)]">
+      <p data-i18n="footer"></p>
+    </footer>
+  </div>
+
+  <!-- Leaflet & Plugins -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+</body>
+</html>
