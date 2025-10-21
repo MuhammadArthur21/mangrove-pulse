@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import ee
 import datetime
+import os
 
 # === MODELS ===
 class GeoJsonPolygon(BaseModel):
@@ -27,14 +28,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# This new block uses a service account for authentication on the server.
+# It expects the path to the JSON key file to be in an environment variable.
 try:
-    ee.Initialize(project="ee-muhammadyusyafarthur")
-    print("✅ GEE initialized successfully (Cloud Project: ee-muhammadyusyafarthur)")
+    # Render will provide the path to the secret file in this environment variable
+    credentials_path = os.getenv("GEE_JSON_KEY_PATH")
+    if not credentials_path or not os.path.exists(credentials_path):
+        # If the env var is not set, the app will fail to start, which is the correct behavior on a server.
+        raise ValueError("GEE_JSON_KEY_PATH environment variable is not set or the file does not exist.")
+
+    # Use the service account credentials to initialize Earth Engine
+    credentials = ee.ServiceAccountCredentials(None, key_file=credentials_path)
+    ee.Initialize(credentials, project="ee-muhammadyusyafarthur")
+    print("✅ GEE initialized successfully using Service Account.")
 except Exception as e:
-    print("⚠️ GEE not initialized, trying to authenticate...")
-    ee.Authenticate()
-    ee.Initialize(project="ee-muhammadyusyafarthur")
-    print("✅ GEE authenticated and initialized successfully!")
+    print(f"❌ FATAL: GEE initialization failed: {e}")
+    # Re-raise the exception to prevent the app from starting with a broken GEE connection.
+    raise e
 
 
 # === GEE HELPER FUNCTIONS ===
