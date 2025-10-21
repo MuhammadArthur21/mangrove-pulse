@@ -1,5 +1,6 @@
 # main.py
 from fastapi import FastAPI, Query
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any
@@ -307,3 +308,9 @@ def export_to_drive(request: ExportRequest):
 
     except Exception as e:
         return {"error": str(e), "status": "FAILED"}
+
+# === MOUNT STATIC FILES (FRONTEND) ===
+# This must be the LAST thing that is mounted.
+# It tells FastAPI to serve the 'frontend' folder for any path that is not an API route.
+# The `html=True` part means it will automatically look for `index.html` for root requests.
+app.mount("/", StaticFiles(directory="../frontend", html=True), name="static")

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // === KONFIGURASI & VARIABEL GLOBAL ===
-  const API_BASE_URL = "http://127.0.0.1:8000";
+  const API_BASE_URL = ""; // The backend is now on the same domain
   let map, activeLayer, drawnItems, drawControl, timeSeriesChart, pieChart;
   let currentLang = 'id';
 
